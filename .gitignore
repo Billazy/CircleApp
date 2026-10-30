@@ -361,3 +361,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+
+# Local development configuration
+CircleApp/appsettings.Development.json
+
+
+# contient uniquement deux fichiers de sauvegarde
+CircleApp/Data/
+_migration_archive/
