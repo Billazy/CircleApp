@@ -5,9 +5,7 @@ namespace CircleApp.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(
-            DbContextOptions<AppDbContext> options)
-            : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
@@ -16,19 +14,21 @@ namespace CircleApp.Data
         public DbSet<Like> Likes { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<Report> Reports { get; set; }
+        public DbSet<Story> Stories { get; set; }
+        public DbSet<Hashtag> Hashtags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //Change name of likes table to Anothers
-            //modelBuilder.Entity<Like>()
-            //    .ToTable("Anothers");
-
-            //base.OnModelCreating(modelBuilder);
-            // Configure the relationship between Post and User
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Posts)
                 .WithOne(p => p.User)
                 .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<User>()
+               .HasMany(u => u.Stories)
+               .WithOne(p => p.User)
+               .HasForeignKey(p => p.UserId);
 
             modelBuilder.Entity<Like>()
                 .HasKey(l => new { l.PostId, l.UserId });
@@ -37,7 +37,7 @@ namespace CircleApp.Data
                 .HasOne(l => l.Post)
                 .WithMany(p => p.Likes)
                 .HasForeignKey(l => l.PostId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Like>()
                 .HasOne(l => l.User)
@@ -45,7 +45,7 @@ namespace CircleApp.Data
                 .HasForeignKey(l => l.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure the relationship between Comment and Post
+            //Comments
             modelBuilder.Entity<Comment>()
                 .HasOne(l => l.Post)
                 .WithMany(p => p.Comments)
@@ -58,7 +58,7 @@ namespace CircleApp.Data
                 .HasForeignKey(l => l.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure the relationship between Favorite and Post
+            //Favorites
             modelBuilder.Entity<Favorite>()
                 .HasKey(f => new { f.PostId, f.UserId });
 
@@ -71,6 +71,22 @@ namespace CircleApp.Data
             modelBuilder.Entity<Favorite>()
                 .HasOne(f => f.User)
                 .WithMany(u => u.Favorites)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Reports
+            modelBuilder.Entity<Report>()
+                .HasKey(f => new { f.PostId, f.UserId });
+
+            modelBuilder.Entity<Report>()
+                .HasOne(f => f.Post)
+                .WithMany(p => p.Reports)
+                .HasForeignKey(f => f.PostId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Report>()
+                .HasOne(f => f.User)
+                .WithMany(u => u.Reports)
                 .HasForeignKey(f => f.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
